@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Web</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous" />
+</head>
+
+<body>
+    <div class="contianer-sm text-center">
+        <div class="row align-items-start">
+            <div class="col-sm px-4">
+                <h1>English Generator</h1>
+                <div class="container-fluid text-center bg-primary rounded"
+                    style="min-height: 120px; background-color: aqua; outline-color: black">
+                    <a class="btn btn-success my-2" id="btnEnglish">Generate English Anime Sentence</a>
+                    <div class="row align-items-start">
+                        <h5 id="isiText" class="text-light">Sentence will show up here</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm px-4">
+                <h1>Indonesia Generator</h1>
+                <div class="container-fluid text-center bg-danger rounded"
+                    style="min-height: 120px; background-color: red; outline-color: black">
+                    <a class="btn btn-success my-2" id="btnIndo">Generate Indo Anime Sentence</a>
+                    <div class="row align-items-start">
+                        <h5 id="isiText2" class="text-white">Sentence will show up here</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+
+    <script>
+        let a = 100;
+
+        const buttonEnglish = document.getElementById("btnEnglish");
+        const buttonIndo = document.getElementById("btnIndo");
+        
+        async function ambilApi() {
+            let file = "https://katanime.vercel.app/api/getrandom";
+            try {
+                const hasil = await fetch(file);
+                const data = await hasil.json();
+                return data;
+            }
+            catch (e) {
+                console.log(e.message);
+            }
+        }
+
+        let url = "https://katanime.vercel.app/api/getrandom";
+
+        buttonIndo.addEventListener("click",() => ambilApi().then(isiData => {
+             document.getElementById("isiText2").innerHTML = isiData.result[0].indo;
+         }));
+
+        buttonEnglish.addEventListener("click",() => ambilApi().then(isiData => {
+             document.getElementById("isiText").innerHTML = isiData.result[0].english;
+         }));
+
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

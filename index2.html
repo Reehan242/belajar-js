@@ -112,11 +112,13 @@
         }).then(hasil2 => {
             console.log(hasil2);
             document.getElementById("isiText2").innerHTML = hasil2.result[2].indo;
+
+            document.getElementById("isiText").innerHTML = hasil2.result[2].english;
         })
 
-        ambilApi().then(isiData => {
-            document.getElementById("isiText").innerHTML = isiData.result[0].english;
-        });
+        // ambilApi().then(isiData => {
+        //     document.getElementById("isiText").innerHTML = isiData.result[0].english;
+        // });
 
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"

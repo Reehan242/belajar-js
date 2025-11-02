@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Confession</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to right, #ff7eb3, #ff758c);
+            font-family: 'Poppins', sans-serif;
+            padding: 20px;
+        }
+
+        .message-box {
+            background: #fff;
+            border-radius: 25px;
+            padding: 40px 25px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+            transition: 0.3s;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #buttonArea {
+            width: 100%;
+            min-height: 80px;
+            position: relative;
+        }
+
+        #btnNo {
+            position: absolute;
+        }
+
+        /* Responsive Tweaks */
+        @media(max-width: 240px) {
+            h3 {
+                font-size: 1.1rem;
+            }
+
+            #btnYes,
+            #btnNo {
+                padding: 8px 8px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="message-box" id="questionBox">
+        <h3>Maukah kamu menjadi pasangan hidupku? 💖</h3>
+
+        <div class="mt-4 d-flex justify-content-center align-items-center bg-warning" id="buttonArea">
+            <button id="btnYes" class="btn btn-success mx-2">Iya</button>
+            <button id="btnNo" class="btn btn-danger mx-2">Tidak</button>
+        </div>
+    </div>
+
+    <div class="message-box hidden" id="answerBox">
+        <h3>Yay!!! Aku juga ❤️🥹</h3>
+        <p>Kita resmi jadi pasangan! 🥰✨</p>
+    </div>
+
+
+    <script>
+        const btnNo = document.getElementById("btnNo");
+        const btnYes = document.getElementById("btnYes");
+        const box = document.getElementById("questionBox");
+        const answer = document.getElementById("answerBox");
+        const area = document.getElementById("buttonArea");
+
+        // Set posisi awal simetris
+        function setInitialPosition() {
+            const yesRect = btnYes.getBoundingClientRect();
+            const offset = yesRect.width + 16;
+            btnNo.style.transform = `translateX(${offset}px)`;
+        }
+        setTimeout(setInitialPosition, 100);
+
+        // No button kabur responsif
+        btnNo.addEventListener("mouseover", () => {
+            const areaRect = area.getBoundingClientRect();
+            const maxX = areaRect.width / 2 - btnNo.offsetWidth;
+            const maxY = areaRect.height / 2 - btnNo.offsetHeight;
+
+            const randomX = Math.random() * (maxX * 2) - maxX;
+            const randomY = Math.random() * (maxY * 2) - maxY;
+
+            btnNo.style.transform = `translate(${randomX}px, ${randomY}px)`;
+        });
+
+        // Klik YES → halaman cinta
+        btnYes.addEventListener("click", () => {
+            box.classList.add("hidden");
+            answer.classList.remove("hidden");
+        });
+    </script>
+
+</body>
+
+</html>
