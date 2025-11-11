@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Typing Speed Test</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #f5f5f5;
+      font-family: 'Courier New', monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      transition: background 0.3s ease;
+    }
+
+    h1 {
+      color: #00ffcc;
+      margin-bottom: 10px;
+    }
+
+    #name-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    #name-input {
+      padding: 10px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      background: #1e1e1e;
+      color: #f5f5f5;
+      outline: none;
+      text-align: center;
+    }
+
+    #word-box {
+      width: 70%;
+      max-width: 800px;
+      height: 70px;
+      overflow-x: auto;
+      white-space: nowrap;
+      border: 2px solid #00ffcc55;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 20px 0;
+      background: #1e1e1e;
+      scroll-behavior: smooth;
+    }
+
+    #word-display {
+      display: inline-block;
+    }
+
+    .word {
+      display: inline-block;
+      margin-right: 20px;
+      font-size: 1.5rem;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      padding: 3px 8px;
+      border-radius: 5px;
+    }
+
+    .active-word {
+      background-color: #00ffcc33;
+    }
+
+    .correct {
+      color: #00ff66;
+    }
+
+    .incorrect {
+      color: #ff4444;
+    }
+
+    #input-area {
+      width: 70%;
+      max-width: 800px;
+      padding: 10px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 5px;
+      background: #1e1e1e;
+      color: #f5f5f5;
+      outline: none;
+      text-align: center;
+    }
+
+    #start-btn, #retry-btn {
+      background-color: #00ffcc;
+      color: #121212;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 15px;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    #start-btn:hover, #retry-btn:hover {
+      background-color: #00ccaa;
+      transform: scale(1.05);
+    }
+
+    #timer {
+      font-size: 1.5rem;
+      color: #ffaa00;
+      margin-top: 10px;
+      transition: color 0.3s ease;
+    }
+
+    #stats, #live-counter {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      text-align: center;
+    }
+
+    .result-box {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid #00ffcc55;
+      margin-top: 20px;
+      width: 320px;
+      text-align: center;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+  </style>
+</head>
+<body>
+  <h1>Typing Speed Test</h1>
+
+  <div id="name-section">
+    <input type="text" id="name-input" placeholder="Masukkan nama Anda..." />
+    <button id="start-btn" disabled>Mulai Tes</button>
+  </div>
+
+  <div id="word-box">
+    <div id="word-display"></div>
+  </div>
+
+  <input type="text" id="input-area" placeholder="Ketik di sini..." disabled />
+  <div id="timer">60</div>
+
+  <div id="live-counter" class="hidden"></div>
+  <div id="stats"></div>
+
+  <script>
+    const words = [
+      "apel","pisang","jeruk","mangga","rambutan","meja","kursi","rumah","sekolah",
+      "buku","pensil","kucing","anjing","mobil","motor","jalan","hujan","langit",
+      "awan","air","minum","makan","tidur","belajar","tulis","baca","warna","hitam",
+      "putih","merah","biru","hijau","kuning","ungu","teman","keluarga","sahabat",
+      "pohon","bunga","daun","laut","gunung","pasir","pantai","malam","siang","pagi",
+      "sore","indah","cerah","gelap","kabut","badai","cuaca","panas","dingin","gelombang",
+      "matahari","bulan","bintang","planet","roket","bumi","air","tanah","angin","api",
+      "logam","emas","perak","besi","kapal","kereta","pesawat","toko","pasar","warung",
+      "kantor","gedung","pintu","jendela","tembok","atap","lantai","sepatu","baju",
+      "celana","jaket","tas","topi","sarung","gelas","piring","sendok","garpu","nasi",
+      "ikan","ayam","telur","roti","gula","garam","kopi","teh","air","kamera","televisi",
+      "komputer","laptop","layar","papan","mouse","musik","suara","lagu","video","gambar",
+      "foto","lukisan","tulisan","huruf","angka","kalimat","paragraf","cerita","novel",
+      "puisi","drama","film","teater","bahasa","indonesia","inggris","jepang","korea",
+      "program","kode","teknologi","mesin","data","sistem","server","internet","online",
+      "cloud","jaringan","aplikasi","website","database","sensor","robot","otomatis",
+      "digital","fitur","layanan"
+    ];
+
+    const wordDisplay = document.getElementById("word-display");
+    const wordBox = document.getElementById("word-box");
+    const inputArea = document.getElementById("input-area");
+    const startBtn = document.getElementById("start-btn");
+    const timerDisplay = document.getElementById("timer");
+    const stats = document.getElementById("stats");
+    const nameInput = document.getElementById("name-input");
+    const liveCounter = document.getElementById("live-counter");
+
+    let username = "";
+    let wordList = [];
+    let currentIndex = 0;
+    let correctWords = 0;
+    let wrongWords = 0;
+    let totalWordsTyped = 0;
+    let totalCharsTyped = 0;
+    let testRunning = false;
+    let time = 60;
+    let timer;
+
+    nameInput.addEventListener("input", () => {
+      startBtn.disabled = nameInput.value.trim() === "";
+    });
+
+    startBtn.addEventListener("click", () => {
+      username = nameInput.value.trim();
+      if (username === "") return;
+      nameInput.disabled = true;
+      startBtn.disabled = true;
+      startTest();
+    });
+
+    function generateWords() {
+      wordList = [];
+      for (let i = 0; i < 150; i++) {
+        const randomWord = words[Math.floor(Math.random() * words.length)];
+        wordList.push(randomWord);
+      }
+      renderWords();
+    }
+
+    function renderWords() {
+      wordDisplay.innerHTML = wordList
+        .map((w, i) => `<span class="word ${i === currentIndex ? 'active-word' : ''}">${w}</span>`)
+        .join('');
+    }
+
+    function startTest() {
+      generateWords();
+      inputArea.disabled = false;
+      inputArea.value = "";
+      inputArea.focus();
+      stats.textContent = "";
+      correctWords = 0;
+      wrongWords = 0;
+      totalWordsTyped = 0;
+      totalCharsTyped = 0;
+      currentIndex = 0;
+      time = 60;
+      timerDisplay.textContent = time;
+      testRunning = true;
+      liveCounter.classList.remove("hidden");
+
+      updateLiveCounter();
+
+      clearInterval(timer);
+      timer = setInterval(() => {
+        time--;
+        timerDisplay.textContent = time;
+        if (time <= 0) endTest();
+      }, 1000);
+    }
+
+    function endTest() {
+      testRunning = false;
+      inputArea.disabled = true;
+      clearInterval(timer);
+      liveCounter.classList.add("hidden");
+
+      const minutes = (60 - time) / 60;
+      const wpm = Math.round(correctWords / minutes);
+      const cpm = Math.round(totalCharsTyped / minutes);
+      const accuracy = totalWordsTyped > 0 ? ((correctWords / totalWordsTyped) * 100).toFixed(2) : 0;
+
+      stats.innerHTML = `
+        <div class="result-box">
+          <h3>Hasil untuk <b>${username}</b></h3>
+          <p>WPM: <b>${wpm}</b></p>
+          <p>CPM: <b>${cpm}</b></p>
+          <p>Akurasi: <b>${accuracy}%</b></p>
+          <p>Kata Benar: <b>${correctWords}</b></p>
+          <p>Kata Salah: <b>${wrongWords}</b></p>
+          <p>Total Karakter: <b>${totalCharsTyped}</b></p>
+          <button id="retry-btn">Coba Lagi</button>
+        </div>
+      `;
+
+      document.getElementById("retry-btn").addEventListener("click", resetTest);
+    }
+
+    function resetTest() {
+      stats.innerHTML = "";
+      inputArea.value = "";
+      wordDisplay.innerHTML = "";
+      nameInput.disabled = false;
+      inputArea.disabled = true;
+      testRunning = false;
+      liveCounter.classList.add("hidden");
+      startBtn.disabled = false;
+      nameInput.focus();
+      timerDisplay.textContent = "60";
+    }
+
+    function updateScroll() {
+      const activeWord = wordDisplay.children[currentIndex];
+      if (activeWord) {
+        activeWord.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      }
+    }
+
+    function updateLiveCounter() {
+      liveCounter.innerHTML = `
+        <p>Kata Benar: <b>${correctWords}</b> | Kata Salah: <b>${wrongWords}</b> | Karakter: <b>${totalCharsTyped}</b></p>
+      `;
+    }
+
+    inputArea.addEventListener("keydown", (e) => {
+      if (!testRunning) return;
+
+      if (e.key === " ") {
+        e.preventDefault();
+        const typed = inputArea.value.trim();
+        const currentWord = wordList[currentIndex];
+
+        totalWordsTyped++;
+        totalCharsTyped += typed.length;
+
+        if (typed === currentWord) {
+          correctWords++;
+          wordDisplay.children[currentIndex].classList.add("correct");
+        } else {
+          wrongWords++;
+          wordDisplay.children[currentIndex].classList.add("incorrect");
+        }
+
+        wordDisplay.children[currentIndex].classList.remove("active-word");
+        currentIndex++;
+
+        if (currentIndex < wordList.length) {
+          wordDisplay.children[currentIndex].classList.add("active-word");
+        }
+
+        inputArea.value = "";
+        updateScroll();
+        updateLiveCounter();
+      }
+    });
+
+    inputArea.addEventListener("input", () => {
+      if (!testRunning) return;
+      const typed = inputArea.value;
+      const currentWord = wordList[currentIndex];
+      const activeSpan = wordDisplay.children[currentIndex];
+      let newHTML = "";
+
+      for (let i = 0; i < currentWord.length; i++) {
+        const char = currentWord[i];
+        const typedChar = typed[i];
+        if (typedChar == null) {
+          newHTML += `<span>${char}</span>`;
+        } else if (typedChar === char) {
+          newHTML += `<span class="correct">${char}</span>`;
+        } else {
+          newHTML += `<span class="incorrect">${char}</span>`;
+        }
+      }
+
+      activeSpan.innerHTML = newHTML;
+      updateLiveCounter();
+    });
+  </script>
+</body>
+</html>
