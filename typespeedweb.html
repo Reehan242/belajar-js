@@ -1,364 +1,435 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Typing Speed Test</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
+    /* Dark Neon Theme — Final */
+    /* Dark Neon Theme — Final */
+    :root {
+      --bg: #0b0f13;
+      --fg: #ffffff;
+      /* Main font brighter */
+      --muted: #d4dbe3;
+      /* Still light but not dominant */
+      --accent: #00ffcc;
+      --accent-2: #00ccaa;
+      --danger: #ff4444;
+      --success: #3ef78b;
+    }
+
     body {
-      background-color: #121212;
-      color: #f5f5f5;
-      font-family: 'Courier New', monospace;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      transition: background 0.3s ease;
+      background: linear-gradient(180deg, #06080a 0%, var(--bg) 100%);
+      color: var(--fg);
+      font-family: "Inter", sans-serif;
+      min-height: 100vh;
     }
 
-    h1 {
-      color: #00ffcc;
-      margin-bottom: 10px;
+    .navbar,
+    .footer {
+      background: rgba(12, 15, 18, 0.88);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    #name-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
+    /* Section cards */
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 12px;
+      backdrop-filter: blur(5px);
     }
 
-    #name-input {
-      padding: 10px;
-      font-size: 1rem;
-      border: none;
-      border-radius: 5px;
-      background: #1e1e1e;
-      color: #f5f5f5;
-      outline: none;
-      text-align: center;
-    }
-
-    #word-box {
-      width: 70%;
-      max-width: 800px;
-      height: 70px;
-      overflow-x: auto;
-      white-space: nowrap;
-      border: 2px solid #00ffcc55;
-      border-radius: 8px;
-      padding: 10px;
-      margin: 20px 0;
-      background: #1e1e1e;
-      scroll-behavior: smooth;
-    }
-
-    #word-display {
-      display: inline-block;
-    }
-
+    /* Words display */
     .word {
       display: inline-block;
-      margin-right: 20px;
-      font-size: 1.5rem;
-      transition: background-color 0.3s ease, color 0.3s ease;
-      padding: 3px 8px;
-      border-radius: 5px;
+      margin-right: 18px;
+      font-size: 1.35rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      letter-spacing: .03em;
+      transition: background .15s, color .15s, box-shadow .15s;
     }
 
     .active-word {
-      background-color: #00ffcc33;
+      background: rgba(0, 255, 204, 0.23) !important;
+      box-shadow: 0 0 12px rgba(0, 255, 204, 0.40);
+      border: 1px solid rgba(0, 255, 204, 0.28);
+      color: var(--fg) !important;
     }
 
     .correct {
-      color: #00ff66;
+      color: var(--success) !important;
     }
 
     .incorrect {
-      color: #ff4444;
+      color: var(--danger) !important;
     }
 
+    .default-char {
+      color: var(--fg) !important;
+    }
+
+    /* Scrollable word box */
+    #word-box {
+      overflow-x: auto;
+      white-space: nowrap;
+      padding: 14px;
+      max-height: 150px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Input styling */
     #input-area {
-      width: 70%;
-      max-width: 800px;
-      padding: 10px;
-      font-size: 1.2rem;
-      border: none;
-      border-radius: 5px;
-      background: #1e1e1e;
-      color: #f5f5f5;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--fg);
+    }
+
+    #input-area:focus {
+      background: rgba(255, 255, 255, 0.10);
+      border-color: var(--accent);
       outline: none;
-      text-align: center;
     }
 
-    #start-btn, #retry-btn {
-      background-color: #00ffcc;
-      color: #121212;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1rem;
-      margin-top: 15px;
-      transition: background 0.3s ease, transform 0.2s ease;
+    #input-area::placeholder {
+      color: var(--muted) !important;
     }
 
-    #start-btn:hover, #retry-btn:hover {
-      background-color: #00ccaa;
-      transform: scale(1.05);
+    /* Label text small but readable */
+    .small-muted {
+      color: var(--muted) !important;
+      font-size: .9rem;
+      font-weight: 400;
     }
 
+    /* Leaderboard */
+    .list-group-item {
+      color: var(--fg) !important;
+      border-color: rgba(255, 255, 255, 0.04);
+    }
+
+    /* Timer */
     #timer {
-      font-size: 1.5rem;
-      color: #ffaa00;
-      margin-top: 10px;
-      transition: color 0.3s ease;
+      font-weight: 700;
+      color: #ffdd55 !important;
     }
 
-    #stats, #live-counter {
-      margin-top: 20px;
-      font-size: 1.2rem;
-      text-align: center;
+    /* Footer */
+    footer.footer {
+      padding: 14px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .result-box {
-      background: #1e1e1e;
-      padding: 20px;
-      border-radius: 10px;
-      border: 2px solid #00ffcc55;
-      margin-top: 20px;
-      width: 320px;
-      text-align: center;
+    .signature {
+      color: var(--accent);
+      font-weight: 600;
     }
 
-    .hidden {
-      display: none;
+    @media (max-width: 576px) {
+      .word {
+        font-size: 1.1rem;
+        margin-right: 12px;
+      }
     }
-
   </style>
 </head>
+
 <body>
-  <h1>Typing Speed Test</h1>
 
-  <div id="name-section">
-    <input type="text" id="name-input" placeholder="Masukkan nama Anda..." />
-    <button id="start-btn" disabled>Mulai Tes</button>
-  </div>
+  <!-- HEADER -->
+  <nav class="navbar navbar-dark px-4">
+    <a class="navbar-brand fw-bold fs-4" href="#">Typing Speed Test</a>
+  </nav>
 
-  <div id="word-box">
-    <div id="word-display"></div>
-  </div>
+  <!-- MAIN -->
+  <main class="container py-4">
+    <div class="row justify-content-center g-4">
+      <div class="col-lg-8">
 
-  <input type="text" id="input-area" placeholder="Ketik di sini..." disabled />
-  <div id="timer">60</div>
+        <!-- Card -->
+        <div class="card p-4 shadow-sm">
 
-  <div id="live-counter" class="hidden"></div>
-  <div id="stats"></div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="mb-0 text-light">Typing Speed Test</h3>
+            <div class="text-end">
+              <div class="small-muted">Timer</div>
+              <div id="timer" class="fs-2 fw-bold text-warning">60</div>
+            </div>
+          </div>
+
+          <!-- Controls -->
+          <div class="row g-2 mb-3">
+            <div class="col-sm-6">
+              <label class="small-muted mb-1">Nama</label>
+              <input id="name-input" class="form-control" placeholder="Masukkan nama..." />
+            </div>
+            <div class="col-sm-3">
+              <label class="small-muted mb-1">Bahasa</label>
+              <select id="lang-select" class="form-select">
+                <option value="id">Indonesia</option>
+                <option value="en">English</option>
+              </select>
+            </div>
+            <div class="col-sm-3 d-grid">
+              <button id="start-btn" class="btn btn-success">Mulai Tes</button>
+            </div>
+          </div>
+
+          <!-- Words -->
+          <div id="word-box" class="rounded mb-3">
+            <div id="word-display"></div>
+          </div>
+
+          <!-- Input -->
+          <input id="input-area" class="form-control form-control-lg mb-3" placeholder="Ketik di sini..." disabled />
+
+          <!-- Live Count -->
+          <div class="d-flex flex-wrap gap-3 small-muted">
+            Benar: <span id="correct-count" class="text-success fw-bold">0</span>
+            Salah: <span id="wrong-count" class="text-danger fw-bold">0</span>
+            Karakter: <span id="char-count" class="fw-bold">0</span>
+            <span class="ms-auto">WPM: <span id="wpm" class="fw-bold text-info">0</span></span>
+          </div>
+
+          <div id="stats" class="mt-3"></div>
+
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="card p-3 mt-4">
+          <h5 class="mb-2 text-warning">Leaderboard</h5>
+          <div id="leaderboard" class="list-group list-group-flush"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer text-center small-muted">
+    © <span id="year"></span> Typing Speed Test — <span class="signature">Made by ReeHan242</span>
+  </footer>
+
+
+  <!-- Firebase support -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <!-- Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    const words = [
-      "apel","pisang","jeruk","mangga","rambutan","meja","kursi","rumah","sekolah",
-      "buku","pensil","kucing","anjing","mobil","motor","jalan","hujan","langit",
-      "awan","air","minum","makan","tidur","belajar","tulis","baca","warna","hitam",
-      "putih","merah","biru","hijau","kuning","ungu","teman","keluarga","sahabat",
-      "pohon","bunga","daun","laut","gunung","pasir","pantai","malam","siang","pagi",
-      "sore","indah","cerah","gelap","kabut","badai","cuaca","panas","dingin","gelombang",
-      "matahari","bulan","bintang","planet","roket","bumi","air","tanah","angin","api",
-      "logam","emas","perak","besi","kapal","kereta","pesawat","toko","pasar","warung",
-      "kantor","gedung","pintu","jendela","tembok","atap","lantai","sepatu","baju",
-      "celana","jaket","tas","topi","sarung","gelas","piring","sendok","garpu","nasi",
-      "ikan","ayam","telur","roti","gula","garam","kopi","teh","air","kamera","televisi",
-      "komputer","laptop","layar","papan","mouse","musik","suara","lagu","video","gambar",
-      "foto","lukisan","tulisan","huruf","angka","kalimat","paragraf","cerita","novel",
-      "puisi","drama","film","teater","bahasa","indonesia","inggris","jepang","korea",
-      "program","kode","teknologi","mesin","data","sistem","server","internet","online",
-      "cloud","jaringan","aplikasi","website","database","sensor","robot","otomatis",
-      "digital","fitur","layanan"
+    /***** FIREBASE CONFIG (optional) ******/
+    const firebaseConfig = {}; // filled later if needed
+    const useFirebase = firebaseConfig && Object.keys(firebaseConfig).length;
+    let db = null;
+    if (useFirebase) {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+    }
+
+    /* Words */
+    const words_id = ["apel", "pisang", "jeruk", "mangga", "rambutan", "meja", "kursi", "rumah", "sekolah",
+      "buku", "pensil", "kucing", "anjing", "mobil", "motor", "jalan", "hujan", "langit",
+      "awan", "air", "minum", "makan", "tidur", "belajar", "tulis", "baca", "warna", "hitam",
+      "putih", "merah", "biru", "hijau", "kuning", "ungu", "teman", "keluarga", "sahabat",
+      "pohon", "bunga", "daun", "laut", "gunung", "pasir", "pantai", "malam", "siang", "pagi",
+      "sore", "indah", "cerah", "gelap", "kabut", "badai", "cuaca", "panas", "dingin", "gelombang",
+      "matahari", "bulan", "bintang", "planet", "roket", "bumi", "tanah", "angin", "api",
+      "logam", "emas", "perak", "besi", "kapal", "kereta", "pesawat", "toko", "pasar", "warung",
+      "kantor", "gedung", "pintu", "jendela", "tembok", "atap", "lantai", "sepatu", "baju",
+      "celana", "jaket", "tas", "topi", "sarung", "gelas", "piring", "sendok", "garpu", "nasi",
+      "ikan", "ayam", "telur", "roti", "gula", "garam", "kopi", "teh", "kamera", "televisi",
+      "komputer", "laptop", "layar", "papan", "mouse", "musik", "suara", "lagu", "video", "gambar",
+      "foto", "lukisan", "tulisan", "huruf", "angka", "kalimat", "paragraf", "cerita", "novel",
+      "puisi", "drama", "film", "teater", "bahasa", "indonesia", "inggris", "program", "kode",
+      "teknologi", "online", "digital"
     ];
 
-    const wordDisplay = document.getElementById("word-display");
-    const wordBox = document.getElementById("word-box");
-    const inputArea = document.getElementById("input-area");
-    const startBtn = document.getElementById("start-btn");
-    const timerDisplay = document.getElementById("timer");
-    const stats = document.getElementById("stats");
+    const words_en = ["apple", "banana", "orange", "grape", "melon", "table", "chair", "house", "school",
+      "pencil", "cat", "dog", "car", "motor", "road", "rain", "sky", "cloud", "water", "drink",
+      "eat", "sleep", "study", "write", "read", "color", "black", "white", "red", "blue", "green",
+      "yellow", "purple", "friend", "family", "tree", "flower", "leaf", "sea", "mountain", "sand",
+      "beach", "night", "day", "morning", "afternoon", "bright", "dark", "fog", "storm", "weather",
+      "hot", "cold", "wave", "sun", "moon", "star", "planet", "rocket", "earth", "air", "land",
+      "wind", "fire", "gold", "silver", "train", "ship", "plane", "market", "shop", "office",
+      "building", "door", "window", "floor", "shoe", "shirt", "pants", "bag", "hat", "glass",
+      "plate", "spoon", "fork", "rice", "fish", "chicken", "egg", "bread", "sugar", "salt", "coffee",
+      "tea", "camera", "television", "computer", "laptop", "keyboard", "mouse", "music", "sound", "song"
+    ];
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    /* Elements */
     const nameInput = document.getElementById("name-input");
-    const liveCounter = document.getElementById("live-counter");
+    const startBtn = document.getElementById("start-btn");
+    const langSelect = document.getElementById("lang-select");
+    const wordDisplay = document.getElementById("word-display");
+    const inputArea = document.getElementById("input-area");
+    const timerDisplay = document.getElementById("timer");
+    const correctCountEl = document.getElementById("correct-count");
+    const wrongCountEl = document.getElementById("wrong-count");
+    const charCountEl = document.getElementById("char-count");
+    const wpmEl = document.getElementById("wpm");
+    const leaderboardEl = document.getElementById("leaderboard");
+    const stats = document.getElementById("stats");
 
-    let username = "";
-    let wordList = [];
-    let currentIndex = 0;
-    let correctWords = 0;
-    let wrongWords = 0;
-    let totalWordsTyped = 0;
-    let totalCharsTyped = 0;
-    let testRunning = false;
-    let time = 60;
-    let timer;
-
-    nameInput.addEventListener("input", () => {
-      startBtn.disabled = nameInput.value.trim() === "";
-    });
-
-    startBtn.addEventListener("click", () => {
-      username = nameInput.value.trim();
-      if (username === "") return;
-      nameInput.disabled = true;
-      startBtn.disabled = true;
-      startTest();
-    });
+    /* State */
+    let username = "", wordList = [], currentIndex = 0;
+    let correctWords = 0, wrongWords = 0, totalWordsTyped = 0, totalCharsTyped = 0;
+    let testRunning = false, time = 60, timer = null;
 
     function generateWords() {
+      const source = langSelect.value === "en" ? words_en : words_id;
       wordList = [];
-      for (let i = 0; i < 150; i++) {
-        const randomWord = words[Math.floor(Math.random() * words.length)];
-        wordList.push(randomWord);
-      }
+      for (let i = 0; i < 150; i++)
+        wordList.push(source[Math.floor(Math.random() * source.length)]);
       renderWords();
     }
 
     function renderWords() {
       wordDisplay.innerHTML = wordList
-        .map((w, i) => `<span class="word ${i === currentIndex ? 'active-word' : ''}">${w}</span>`)
+        .map((w, i) => `<span class="word ${i === currentIndex ? 'active-word' : ''}">${escapeHtml(w)}</span>`)
         .join('');
     }
 
+    function escapeHtml(u) {
+      return u.replace(/[&<"']/g, m => ({ '&': '&amp;', '<': '&lt;', '"': '&quot;', "'": '&#039;' }[m]));
+    }
+
+    startBtn.addEventListener("click", () => {
+      username = nameInput.value.trim() || "Anonymous";
+      nameInput.disabled = true; startBtn.disabled = true; langSelect.disabled = true;
+      startTest();
+    });
+
     function startTest() {
       generateWords();
-      inputArea.disabled = false;
-      inputArea.value = "";
-      inputArea.focus();
-      stats.textContent = "";
-      correctWords = 0;
-      wrongWords = 0;
-      totalWordsTyped = 0;
-      totalCharsTyped = 0;
-      currentIndex = 0;
-      time = 60;
-      timerDisplay.textContent = time;
-      testRunning = true;
-      liveCounter.classList.remove("hidden");
-
-      updateLiveCounter();
+      inputArea.disabled = false; inputArea.value = ""; inputArea.focus();
+      stats.innerHTML = "";
+      correctWords = wrongWords = totalWordsTyped = totalCharsTyped = 0;
+      currentIndex = 0; time = 60; timerDisplay.textContent = 60; testRunning = true;
+      updateLive();
 
       clearInterval(timer);
       timer = setInterval(() => {
-        time--;
-        timerDisplay.textContent = time;
+        timerDisplay.textContent = --time;
         if (time <= 0) endTest();
       }, 1000);
     }
 
     function endTest() {
-      testRunning = false;
-      inputArea.disabled = true;
+      testRunning = false; inputArea.disabled = true;
       clearInterval(timer);
-      liveCounter.classList.add("hidden");
-
-      const minutes = (60 - time) / 60;
+      const minutes = (60 - time) / 60 || (1 / 60);
       const wpm = Math.round(correctWords / minutes);
       const cpm = Math.round(totalCharsTyped / minutes);
-      const accuracy = totalWordsTyped > 0 ? ((correctWords / totalWordsTyped) * 100).toFixed(2) : 0;
+      const accuracy = totalWordsTyped > 0 ? ((correctWords / totalWordsTyped) * 100).toFixed(2) : "0.00";
 
       stats.innerHTML = `
-        <div class="result-box">
-          <h3>Hasil untuk <b>${username}</b></h3>
-          <p>WPM: <b>${wpm}</b></p>
-          <p>CPM: <b>${cpm}</b></p>
-          <p>Akurasi: <b>${accuracy}%</b></p>
-          <p>Kata Benar: <b>${correctWords}</b></p>
-          <p>Kata Salah: <b>${wrongWords}</b></p>
-          <p>Total Karakter: <b>${totalCharsTyped}</b></p>
-          <button id="retry-btn">Coba Lagi</button>
-        </div>
-      `;
-
-      document.getElementById("retry-btn").addEventListener("click", resetTest);
+      <div class="p-3 border rounded mt-3 text-light">
+        <h5>Hasil: <b>${escapeHtml(username)}</b></h5>
+        <div>WPM: <b>${wpm}</b> | CPM: <b>${cpm}</b> | Akurasi: <b>${accuracy}%</b></div>
+        <button id="retry-btn" class="btn btn-outline-light btn-sm mt-2">Coba Lagi</button>
+        <button id="save-btn" class="btn btn-success btn-sm mt-2">Simpan Skor</button>
+      </div>`;
+      document.getElementById("retry-btn").onclick = resetTest;
+      document.getElementById("save-btn").onclick = () => saveScore({ username, wpm, cpm, accuracy });
+      updateLeaderboard();
     }
 
     function resetTest() {
-      stats.innerHTML = "";
-      inputArea.value = "";
-      wordDisplay.innerHTML = "";
-      nameInput.disabled = false;
-      inputArea.disabled = true;
-      testRunning = false;
-      liveCounter.classList.add("hidden");
-      startBtn.disabled = false;
-      nameInput.focus();
-      timerDisplay.textContent = "60";
+      stats.innerHTML = ""; inputArea.value = "";
+      wordDisplay.innerHTML = ""; nameInput.disabled = false; langSelect.disabled = false;
+      inputArea.disabled = true; testRunning = false;
+      startBtn.disabled = false; nameInput.focus(); timerDisplay.textContent = "60";
     }
 
     function updateScroll() {
-      const activeWord = wordDisplay.children[currentIndex];
-      if (activeWord) {
-        activeWord.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-      }
+      const active = wordDisplay.children[currentIndex];
+      if (active) active.scrollIntoView({ behavior: "smooth", inline: "center" });
     }
 
-    function updateLiveCounter() {
-      liveCounter.innerHTML = `
-        <p>Kata Benar: <b>${correctWords}</b> | Kata Salah: <b>${wrongWords}</b> | Karakter: <b>${totalCharsTyped}</b></p>
-      `;
+    function updateLive() {
+      correctCountEl.textContent = correctWords;
+      wrongCountEl.textContent = wrongWords;
+      charCountEl.textContent = totalCharsTyped;
+      const minutes = ((60 - time) / 60) || (1 / 60);
+      wpmEl.textContent = Math.round(correctWords / minutes) || 0;
     }
 
     inputArea.addEventListener("keydown", (e) => {
       if (!testRunning) return;
-
       if (e.key === " ") {
         e.preventDefault();
         const typed = inputArea.value.trim();
-        const currentWord = wordList[currentIndex];
-
-        totalWordsTyped++;
-        totalCharsTyped += typed.length;
-
-        if (typed === currentWord) {
-          correctWords++;
-          wordDisplay.children[currentIndex].classList.add("correct");
+        totalWordsTyped++; totalCharsTyped += typed.length;
+        const correct = typed === wordList[currentIndex];
+        if (correct) {
+          correctWords++; wordDisplay.children[currentIndex].classList.add("correct");
         } else {
-          wrongWords++;
-          wordDisplay.children[currentIndex].classList.add("incorrect");
+          wrongWords++; wordDisplay.children[currentIndex].classList.add("incorrect");
         }
-
         wordDisplay.children[currentIndex].classList.remove("active-word");
         currentIndex++;
-
-        if (currentIndex < wordList.length) {
+        if (currentIndex < wordList.length)
           wordDisplay.children[currentIndex].classList.add("active-word");
-        }
-
-        inputArea.value = "";
-        updateScroll();
-        updateLiveCounter();
+        inputArea.value = ""; updateScroll(); updateLive();
       }
     });
 
     inputArea.addEventListener("input", () => {
       if (!testRunning) return;
       const typed = inputArea.value;
-      const currentWord = wordList[currentIndex];
-      const activeSpan = wordDisplay.children[currentIndex];
-      let newHTML = "";
-
-      for (let i = 0; i < currentWord.length; i++) {
-        const char = currentWord[i];
-        const typedChar = typed[i];
-        if (typedChar == null) {
-          newHTML += `<span>${char}</span>`;
-        } else if (typedChar === char) {
-          newHTML += `<span class="correct">${char}</span>`;
-        } else {
-          newHTML += `<span class="incorrect">${char}</span>`;
-        }
+      const current = wordList[currentIndex] || "";
+      const span = wordDisplay.children[currentIndex];
+      if (!span) return;
+      let html = "";
+      for (let i = 0; i < current.length; i++) {
+        const ch = current[i], t = typed[i];
+        if (t == null) html += `<span class="default-char">${ch}</span>`;
+        else if (t === ch) html += `<span class="correct">${ch}</span>`;
+        else html += `<span class="incorrect">${ch}</span>`;
       }
-
-      activeSpan.innerHTML = newHTML;
-      updateLiveCounter();
+      span.innerHTML = html;
+      updateLive();
     });
+
+    /******** Leaderboard (local fallback) *******/
+    function saveLocal(entry) {
+      const key = langSelect.value === "en" ? "ts_lb_en" : "ts_lb_id";
+      const arr = JSON.parse(localStorage.getItem(key) || "[]");
+      arr.push(entry);
+      localStorage.setItem(key, JSON.stringify(arr));
+    }
+
+    async function saveScore({ username, wpm, cpm, accuracy }) {
+      const entry = { username, wpm, cpm, accuracy, timestamp: Date.now() };
+      saveLocal(entry);
+      alert("Skor disimpan (local)!");
+      updateLeaderboard();
+    }
+
+    async function updateLeaderboard() {
+      const key = langSelect.value === "en" ? "ts_lb_en" : "ts_lb_id";
+      const arr = JSON.parse(localStorage.getItem(key) || "[]");
+      arr.sort((a, b) => (b.wpm - a.wpm) || (b.accuracy - a.accuracy));
+      leaderboardEl.innerHTML = "";
+      arr.slice(0, 10).forEach(e => {
+        leaderboardEl.innerHTML += `<div class="list-group-item bg-transparent text-light d-flex justify-content-between">
+        <span>${escapeHtml(e.username)}</span><span>${e.wpm} WPM</span>
+      </div>`;
+      });
+    }
+
+    langSelect.onchange = updateLeaderboard;
+    window.onload = updateLeaderboard;
   </script>
+
 </body>
+
 </html>
